@@ -39,6 +39,17 @@ To minimize dependencies, only the sqlite backend is included by default.
 
     pip install 'ibis-framework[postgres]'
 
+For DuckDB, install the `duckdb` extra and upgrade the database engine:
+
+    pip install --upgrade 'vdsql[duckdb]' duckdb
+
+For a local checkout, run this from `visidata/apps/vdsql`:
+
+    pip install --upgrade '.[duckdb]' duckdb
+
+This uses Ibis 12 or later and permits the latest stable DuckDB release.
+DuckDB must be recent enough to read the database file's storage format.
+
 ## Usage
 
 ### Connecting to databases
@@ -65,7 +76,7 @@ You can learn about VisiData starting with the [Intro to VisiData Tutorial](http
 
 There are a few differences, however:
 
-- `"` (dup-sheet) runs a new base query, including added columns, filtering for the current selection, and applying the current sort order.
+- `"` (dup-selected) runs a new base query, including added columns, filtering for the current selection, and applying the current sort order.
 - `z"` creates a new sheet with a different row limit.
 - `gz"` removes the row limit entirely (fetch all rows).
 - `'` casts the current column to its given type, persisting into future queries (with `"`).
@@ -135,6 +146,15 @@ If you have problems connecting, please [file an issue](https://github.com/saulp
 - Dask
 - PySpark
 - HeavyAI
+
+## Development tests
+
+After installing the DuckDB extra, run this from the VisiData repository root:
+
+    python -m visidata.apps.vdsql --batch --config tests/.visidatarc --play visidata/apps/vdsql/tests/duckdb.vdx
+
+The test creates a temporary database with the installed DuckDB version and its latest storage format.
+It checks table loading, SQL queries, filtering, and frequency tables.
 
 # License
 

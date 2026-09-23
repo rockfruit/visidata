@@ -1,4 +1,4 @@
-ibis-framework[sqlite]
+ibis-framework[sqlite]>=12
 ibis-substrait
 sqlparse
 pandas>=1.5.0

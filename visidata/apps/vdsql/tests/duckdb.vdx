@@ -1,0 +1,16 @@
+# Use the latest storage format so old DuckDB readers cannot mask incompatibility.
+exec-python import duckdb, tempfile; vd.duckdb_test_dir = tempfile.TemporaryDirectory(); vd.duckdb_test_path = vd.duckdb_test_dir.name + '/current.duckdb'
+exec-python con = duckdb.connect(vd.duckdb_test_path, config={'storage_compatibility_version': 'latest'}); con.execute("CREATE TABLE items AS SELECT * FROM (VALUES (1, 'a', 10), (2, 'b', 30), (3, 'a', 20)) t(id, category, amount)"); con.close()
+exec-python vd.push(vd.open_vdsql(Path(vd.duckdb_test_path)))
+assert-expr sheet.nRows == 1 and sheet.rows[0].table_name == 'items'
+dive-row
+assert-expr sheet.nRows == 3
+exec-sql SELECT * FROM items ORDER BY amount DESC
+assert-expr sheet.query_result['amount'].tolist() == [30, 20, 10]
+select-expr amount > 10
+dup-selected
+assert-expr sheet.nRows == 2
+col category
+freq-col
+assert-expr sheet.nRows == 2 and sheet.query_result['count'].sum() == 2
+exec-python vd.duckdb_test_dir.cleanup()
